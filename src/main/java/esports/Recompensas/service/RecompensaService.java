@@ -1,16 +1,17 @@
 package esports.Recompensas.service;
 
-import esports.Recompensas.dto.RecompensaRequestDTO;
-import esports.Recompensas.dto.RecompensaResponseDTO;
+import esports.Recompensas.client.AuditoriaClient;
+import esports.Recompensas.client.PremioClient;
+import esports.Recompensas.dto.*;
 import esports.Recompensas.exception.RecompensaNotFoundException;
 import esports.Recompensas.model.Recompensa;
 import esports.Recompensas.repository.RecompensaRepository;
-import lombok.Data;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -20,6 +21,8 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 public class RecompensaService {
     private final RecompensaRepository recompensaRepository;
+    private final PremioClient premioClient;
+    private final AuditoriaClient auditoriaClient;
 
     public RecompensaResponseDTO MapToDto(Recompensa recompensa ) {
         return new RecompensaResponseDTO(
@@ -49,7 +52,19 @@ public class RecompensaService {
         log.warn("Recompensa con ID {} no encontrada o inactiva ", id);
         throw new RecompensaNotFoundException("No se puede eliminar, ID " + id + " no encontrado");
     }
+@Transactional
+public RecompensaResponseDTO generarRecompensa(RecompensaRequestDTO dto){
+     log.info("generando para el equipo ID {} en el torneo ID {}", dto.getEquipo_id(), dto.getTorneo_id());
 
+     log.info("consultando microservicio premio para el ID {}", dto.getPremio_id());
+    PremioResponseDTO premioInfo = premioClient.obtenerPremioPorId(dto.getPremio_id());
+
+    String calculoReparto;
+    if ("Efectivo".equalsIgnoreCase(premioInfo.getTipoPremio())){
+        int
+    }
+
+    }
     @Transactional
     public void eliminarRecompensa(Long id) {
         log.info(" eliminando recompensa ID {} ", id);
@@ -59,9 +74,18 @@ public class RecompensaService {
         recompensaRepository.findById(id).ifPresent(recompensa -> {
             recompensa.setActivo(false);
             recompensaRepository.save(recompensa);
+            generarAuditoria("Se elimino recompensa");
 
         });
 
+    }
+    public void generarAuditoria(String detalle){
+        AuditoriaRequestDTO dto = new AuditoriaRequestDTO();
+        LocalDate ahora = LocalDate.now();
+        dto.setDetalle(detalle);
+        dto.setFecha(ahora);
+
+        AuditoriaResponseDTO respuesta = auditoriaClient.generarAuditoria(dto);
     }
 
 }
