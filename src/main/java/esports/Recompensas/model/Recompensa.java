@@ -15,15 +15,23 @@ public class Recompensa {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long recompensa_id;
 
-    @Column(name = "premio_reparto", length = 50)
-    private String premioReparto;
+    @Column(name = "torneo_id", nullable = false)
+    private Long torneoId;
 
-    private Long equipo_id;
+    @Column(name = "equipo_id", nullable = false)
+    private Long equipoId;
 
-    private Long premio_id;
+    @Column(name = "premio_id", nullable = false)
+    private Long premioId;
 
-    private Long torneo_id;
-    private Boolean activo;
 
+    @Column(name = "monto_total", nullable = false)
+    private Double montoTotal;      // Lo que costaba el premio entero (sacado de Inventario)
+
+    @Column(name = "monto_individual", nullable = false)
+    private Double montoIndividual;
+
+    @Column(nullable = false)
+    private Boolean activo = true;
 
 }

@@ -5,14 +5,17 @@ import lombok.Data;
 
 @Data
 public class RecompensaRequestDTO {
-    @NotNull(message = "El ID del equipo es obligatorio")
-    private Long equipo_id;
 
-    @NotNull(message = "el ID del premio es obligatorio")
-    private Long premio_id;
+
 
     @NotNull(message = "El ID torneo es obligatorio")
-    private Long torneo_id;
+    private Long torneoId;
+
+    @NotNull(message = "El ID del equipo es obligatorio")
+    private Long equipoId;
+
+    @NotNull(message = "el ID del premio es obligatorio")
+    private Long premioId;
 
     private Boolean activo = true;
 }
