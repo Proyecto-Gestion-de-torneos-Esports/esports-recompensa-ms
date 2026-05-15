@@ -89,6 +89,7 @@ public RecompensaResponseDTO ProcesarRecompensa(RecompensaRequestDTO dto){
      nueva.setActivo(true);
 
      Recompensa guardada = recompensaRepository.save(nueva);
+    generarAuditoria("Se genero/repartio la recompensa");
 
      return mapToDto(guardada);
 
