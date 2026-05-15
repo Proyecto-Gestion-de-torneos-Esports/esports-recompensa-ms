@@ -16,6 +16,6 @@ public class RecompensaRequestDTO {
 
     @NotNull(message = "el ID del premio es obligatorio")
     private Long premioId;
-
+    @NotNull(message = "El campo activo es obligatorio")
     private Boolean activo = true;
 }
