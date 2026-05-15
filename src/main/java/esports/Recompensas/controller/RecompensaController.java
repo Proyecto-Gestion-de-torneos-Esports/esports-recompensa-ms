@@ -20,7 +20,7 @@ public class RecompensaController {
 public ResponseEntity<List<RecompensaResponseDTO>> obtenerTodos() {
     return ResponseEntity.ok(recompensaService.obtenerTodos());
   }
-  @GetMapping("/{id}")
+  @GetMapping("{id}")
     public ResponseEntity<RecompensaResponseDTO> buscarPorId(@PathVariable Long id){
     return ResponseEntity.ok(recompensaService.buscarPorid(id));
   }
