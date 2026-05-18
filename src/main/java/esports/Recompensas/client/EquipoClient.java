@@ -6,10 +6,10 @@ import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 
-@FeignClient(name = "equipo-service", url = "http://localhost:8002/api/equipos")
+@FeignClient(name = "equipos", url = "http://localhost:8002/api/equipos")
 public interface EquipoClient {
     @GetMapping("/{id}")
-    EquipoResponseDTO obtenerEquipoPorId(@PathVariable("id") Long id);
+    EquipoResponseDTO obtenerEquipoPorId(@PathVariable Long id);
 
 
     //DTO espejo captura datos especificos

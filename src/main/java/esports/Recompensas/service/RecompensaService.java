@@ -14,6 +14,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
@@ -28,14 +29,26 @@ public class RecompensaService {
     private final PremioClient premioClient;
 
 
+
     public RecompensaResponseDTO mapToDto(Recompensa recompensa ) {
-        var equipo = equipoClient.obtenerEquipoPorId(recompensa.getEquipoId());
-        Integer cantidadIntegrantes = (equipo != null) ? equipo.getCantidadIntegrantes() : 0;
+        Integer cantidadIntegrantes = 0;
+        try {
+
+            var equipo = equipoClient.obtenerEquipoPorId(recompensa.getEquipoId());
+            if (equipo != null) {
+                cantidadIntegrantes = equipo.getCantidadIntegrantes();
+            }
+        } catch (Exception e) {
+
+            log.error("No se pudo obtener la información del equipo ID {}: {}", recompensa.getEquipoId(), e.getMessage());
+        }
+        var premio = premioClient.obtenerPremioPorId(recompensa.getPremioId());
         return new RecompensaResponseDTO(
-                recompensa.getRecompensa_id(),
+                recompensa.getRecompensaId(),
                 recompensa.getTorneoId(),
                 recompensa.getEquipoId(),
                 recompensa.getPremioId(),
+                premio.getTipoPremio(),
                 recompensa.getMontoTotal(),
                 cantidadIntegrantes,
                 recompensa.getMontoIndividual(),
@@ -93,6 +106,36 @@ public RecompensaResponseDTO ProcesarRecompensa(RecompensaRequestDTO dto){
 
      return mapToDto(guardada);
 
+    }
+
+
+    @Transactional
+    public Optional<RecompensaResponseDTO> actualizar(Long id, RecompensaRequestDTO dto){
+        return recompensaRepository.findById(id).map(recompensa -> {
+            recompensa.setTorneoId(dto.getTorneoId());
+            recompensa.setEquipoId(dto.getEquipoId());
+            recompensa.setPremioId(dto.getPremioId());
+
+            var premio = premioClient.obtenerPremioPorId(dto.getPremioId());
+            var equipo = equipoClient.obtenerEquipoPorId(dto.getEquipoId());
+
+            Double montoTotal = premio.getCantidadMonto();
+            Integer integrantes = equipo.getCantidadIntegrantes();
+            Double montoIndividual = 0.0;
+
+            if ("EFECTIVO".equalsIgnoreCase(premio.getTipoPremio())){
+                if (integrantes == null || integrantes <= 0) {
+                    throw new RuntimeException("No hay integrantes para dividir el dinero");
+                }
+                montoIndividual = montoTotal /integrantes;
+            }
+
+            recompensa.setMontoTotal(montoTotal);
+            recompensa.setMontoIndividual(montoIndividual);
+
+            Recompensa guardada = recompensaRepository.save(recompensa);
+            return mapToDto(recompensa);
+        });
     }
     @Transactional
     public void eliminarRecompensa(Long id) {

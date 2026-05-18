@@ -1,7 +1,6 @@
 package esports.Recompensas.model;
 
 import jakarta.persistence.*;
-import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -13,7 +12,8 @@ public class Recompensa {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long recompensa_id;
+    @Column(name = "recompensa_id")
+    private Long recompensaId;
 
     @Column(name = "torneo_id", nullable = false)
     private Long torneoId;
@@ -26,7 +26,7 @@ public class Recompensa {
 
 
     @Column(name = "monto_total", nullable = false)
-    private Double montoTotal;      // Lo que costaba el premio entero (sacado de Inventario)
+    private Double montoTotal;      // Lo que costaba el premio entero
 
     @Column(name = "monto_individual", nullable = false)
     private Double montoIndividual;
