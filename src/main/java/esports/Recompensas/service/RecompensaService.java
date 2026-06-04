@@ -3,10 +3,12 @@ package esports.Recompensas.service;
 import esports.Recompensas.client.AuditoriaClient;
 import esports.Recompensas.client.EquipoClient;
 import esports.Recompensas.client.PremioClient;
+import esports.Recompensas.client.TorneoClient;
 import esports.Recompensas.dto.*;
 import esports.Recompensas.exception.RecompensaNotFoundException;
 import esports.Recompensas.model.Recompensa;
 import esports.Recompensas.repository.RecompensaRepository;
+import feign.FeignException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -27,6 +29,7 @@ public class RecompensaService {
     private final AuditoriaClient auditoriaClient;
     private final EquipoClient equipoClient;
     private final PremioClient premioClient;
+    private final TorneoClient torneoClient;
 
 
 
@@ -77,7 +80,15 @@ public class RecompensaService {
 public RecompensaResponseDTO ProcesarRecompensa(RecompensaRequestDTO dto){
      log.info("generando para el equipo ID {} en el torneo ID {}", dto.getEquipoId(), dto.getTorneoId());
     //var determina el tipo de dato automaticamente
-     var premio = premioClient.obtenerPremioPorId(dto.getPremioId());
+    try {
+        torneoClient.obtenerTorneoPorId(dto.getTorneoId());
+    } catch (FeignException.NotFound e) {
+        throw new RuntimeException("El torneo con ID " + dto.getTorneoId() + " no existe.");
+    } catch (FeignException e) {
+        throw new RuntimeException("Error al conectar con Torneos: " + e.getMessage());
+    }
+
+    var premio = premioClient.obtenerPremioPorId(dto.getPremioId());
      var equipo = equipoClient.obtenerEquipoPorId(dto.getEquipoId());
 
 
@@ -112,12 +123,20 @@ public RecompensaResponseDTO ProcesarRecompensa(RecompensaRequestDTO dto){
     @Transactional
     public Optional<RecompensaResponseDTO> actualizar(Long id, RecompensaRequestDTO dto){
         return recompensaRepository.findById(id).map(recompensa -> {
+            try {
+                torneoClient.obtenerTorneoPorId(dto.getTorneoId());
+            } catch (FeignException.NotFound e) {
+                throw new RuntimeException("El torneo con ID " + dto.getTorneoId() + " no existe.");
+            } catch (FeignException e) {
+                throw new RuntimeException("Error al conectar con Torneos: " + e.getMessage());
+            }
             recompensa.setTorneoId(dto.getTorneoId());
             recompensa.setEquipoId(dto.getEquipoId());
             recompensa.setPremioId(dto.getPremioId());
 
             var premio = premioClient.obtenerPremioPorId(dto.getPremioId());
             var equipo = equipoClient.obtenerEquipoPorId(dto.getEquipoId());
+
 
             Double montoTotal = premio.getCantidadMonto();
             Integer integrantes = equipo.getCantidadIntegrantes();
