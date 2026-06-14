@@ -1,5 +1,6 @@
 package esports.Recompensas.model;
 
+import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -8,11 +9,13 @@ import lombok.NoArgsConstructor;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
+@Schema(description = "Estructura de datos que retorna los detalles calculados de la recompensa")
 public class Recompensa {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "recompensa_id")
+
     private Long recompensaId;
 
     @Column(name = "torneo_id", nullable = false)
