@@ -104,6 +104,7 @@ public RecompensaResponseDTO ProcesarRecompensa(RecompensaRequestDTO dto){
      nueva.setActivo(true);
 
      Recompensa guardada = recompensaRepository.save(nueva);
+    log.info("Recompensa generada correctamente con ID: {}", guardada.getRecompensaId());
     generarAuditoria("Se genero/repartio la recompensa");
 
      return mapToDto(guardada);
@@ -139,6 +140,8 @@ public RecompensaResponseDTO ProcesarRecompensa(RecompensaRequestDTO dto){
             recompensa.setMontoIndividual(montoIndividual);
 
             Recompensa guardada = recompensaRepository.save(recompensa);
+            log.info("La recompensa ID: {} fue actualizada correctamente", id);
+            generarAuditoria("Se actualizo recompensa");
             return mapToDto(recompensa);
         });
     }
