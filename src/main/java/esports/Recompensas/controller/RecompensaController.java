@@ -14,6 +14,7 @@ import org.springframework.hateoas.CollectionModel;
 import org.springframework.hateoas.EntityModel;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
@@ -29,6 +30,7 @@ public class RecompensaController {
 
   @Operation(summary = "Listar todas las recompensas", description = "Retorna una lista de todas las recompensas activas")
   @ApiResponse(responseCode = "200", description = "Lista obtenida con éxito")
+  @PreAuthorize("hasRole('JUGADOR') or hasRole('COACH') or hasRole('ARBITRO') or hasRole('ADMIN')")
   @GetMapping
   public ResponseEntity<List<RecompensaResponseDTO>> obtenerTodos() {
     List<RecompensaResponseDTO> lista = recompensaService.obtenerTodos().stream()
@@ -42,6 +44,7 @@ public class RecompensaController {
           @ApiResponse(responseCode = "200", description = "Recompensa encontrada exitosamente"),
           @ApiResponse(responseCode = "404", description = "Recompensa no encontrada o inactiva")
   })
+  @PreAuthorize("hasRole('JUGADOR') or hasRole('COACH') or hasRole('ARBITRO') or hasRole('ADMIN')")
   @GetMapping("/{id}")
   public ResponseEntity<RecompensaResponseDTO> buscarPorId(@PathVariable Long id){
     RecompensaResponseDTO recompensa = recompensaService.buscarPorid(id);
@@ -55,6 +58,7 @@ public class RecompensaController {
           @ApiResponse(responseCode = "404", description = "Torneo, equipo o premio no encontrados en los otros microservicios"),
           @ApiResponse(responseCode = "500", description = "Error de comunicación con microservicios externos")
   })
+  @PreAuthorize("hasRole('ARBITRO') or hasRole('ADMIN')")
   @PostMapping
   public ResponseEntity<RecompensaResponseDTO> procesarRecompensa(@Valid @RequestBody RecompensaRequestDTO dto){
     RecompensaResponseDTO recompensa = recompensaService.ProcesarRecompensa(dto);
@@ -67,6 +71,7 @@ public class RecompensaController {
           @ApiResponse(responseCode = "400", description = "Datos de entrada inválidos"),
           @ApiResponse(responseCode = "404", description = "Recompensa no encontrada")
   })
+  @PreAuthorize("hasRole('ARBITRO') or hasRole('ADMIN')")
   @PutMapping("/{id}")
   public ResponseEntity<RecompensaResponseDTO> actualizarRecompensa(@PathVariable Long id, @Valid @RequestBody RecompensaRequestDTO dto){
     return recompensaService.actualizar(id, dto)
@@ -79,6 +84,7 @@ public class RecompensaController {
           @ApiResponse(responseCode = "204", description = "Recompensa eliminada con éxito"),
           @ApiResponse(responseCode = "404", description = "Recompensa no encontrada")
   })
+  @PreAuthorize("hasRole('ADMIN')")
   @DeleteMapping("/{id}")
   public ResponseEntity<Void> eliminarRecompensa(@PathVariable Long id){
     recompensaService.eliminarRecompensa(id);

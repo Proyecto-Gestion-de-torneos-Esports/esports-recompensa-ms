@@ -1,4 +1,5 @@
 package esports.Recompensas.controller;
+import esports.Recompensas.assemblers.RecompensaModelAsemblers;
 import esports.Recompensas.dto.RecompensaRequestDTO;
 import esports.Recompensas.dto.RecompensaResponseDTO;
 import esports.Recompensas.service.RecompensaService;
@@ -10,7 +11,9 @@ import org.mockito.Mock;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.webmvc.test.autoconfigure.WebMvcTest;
 
+import org.springframework.context.annotation.Import;
 import org.springframework.http.MediaType;
+import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
 import tools.jackson.databind.ObjectMapper;
@@ -27,9 +30,14 @@ import static org.mockito.Mockito.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
-
+import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @WebMvcTest(RecompensaController.class)
+@Import({RecompensaModelAsemblers.class})
+@WithMockUser(roles = "ADMIN")
+
 public class RecompensaControllerTest {
 
     @Autowired
